@@ -10,7 +10,6 @@ import { Send_Data_VideoYT } from "@/_actionServer/control_dataVideo";
 import { database } from "@/_lib/firebaseApi/firebase_credentials";
 import { onValue, ref, set } from "firebase/database";
 
-import { Channel } from "pusher-js";
 import { DetailsOptionVideo } from "@/_lib/type";
 
 const DETAILS_VIDEO:DetailsOptionVideo = {
@@ -22,8 +21,6 @@ const DETAILS_VIDEO:DetailsOptionVideo = {
     //mute: false,
     //SphericalProperties: null
 };
-
-let channel:Channel;
 
 export function Video_Youtube(){
     const [sessionStorageCode] = useSessionStorage("Code_Cinema_Room");
@@ -166,13 +163,12 @@ export function Video_Youtube(){
         };
     }, [detailsVideo, playerIsReady, sessionStorageCode, users]);
 
-    const PusherLib = async () => {
-        const pusherClient = (await import('@/_lib/pusherAPI/client_pusher')).default;
-
-        channel = pusherClient.subscribe(sessionStorageCode);
-                        
-        channel.bind('incoming-data-video-yt', ({detailsVideo}:{detailsVideo:{ currentTime:number, volume:number, pause:boolean, speedVideo:number }}) => {
-            setDetailsVideo((prev) => ({...prev, currentTime: detailsVideo.currentTime, volume: detailsVideo.volume, pause: detailsVideo.pause, speedVideo: detailsVideo.speedVideo }));
+    const gettingDetailsVideo = async () => {
+        onValue(ref(database, `${sessionStorageCode}/details`), (snapshot) => {
+            if(snapshot.val()){
+                const data:DetailsOptionVideo = snapshot.val();
+                setDetailsVideo((prev) => ({...prev, currentTime: data.currentTime, volume: data.volume, pause: data.pause, speedVideo: data.speedVideo }));
+            }
         });
     };
 
@@ -185,7 +181,7 @@ export function Video_Youtube(){
             };
 
             if(!JSON.parse(sessionStorageHost)){
-                PusherLib();
+               gettingDetailsVideo();
             };
         }, 1000);
 

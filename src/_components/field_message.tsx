@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 import styleSlug from "../app/cinema_room/[slug]/page.module.css";
 
@@ -8,10 +8,8 @@ import { useSessionStorage } from "@/useCustoms/sessionStorage";
 
 import { Send_Message } from "@/_actionServer/formChat_Main_Videos";
 
-import { child, get, ref } from "firebase/database";
+import { onValue, ref } from "firebase/database";
 import { database } from "@/_lib/firebaseApi/firebase_credentials";
-
-import { Channel } from "pusher-js";
 
 /*interface FormElements extends HTMLFormControlsCollection {
     messageInput: HTMLInputElement
@@ -26,8 +24,6 @@ interface Provider {
     message: string,
 };
 
-let channel:Channel;
-
 export function Field_Message(){
     const [sessionStorageCode] = useSessionStorage("Code_Cinema_Room");
     const [sessionStorageUsername] = useSessionStorage("Username_Cinema_Room");
@@ -36,7 +32,7 @@ export function Field_Message(){
     async function handleSubmit(e: FormEvent<HTMLFormElement>){
         e.preventDefault()
 
-        await Send_Message( { sessionStorageCode, sessionStorageUsername, message: formRef.current!.value } );
+        Send_Message( { sessionStorageCode, sessionStorageUsername, message: formRef.current!.value } );
         
         formRef.current!.value = "";
     };
@@ -63,36 +59,18 @@ export function Field_Show_Message(){
         messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    const PusherLib = useCallback(async () => {
-        const pusherClient = (await import('@/_lib/pusherAPI/client_pusher')).default;
-    
-        channel = pusherClient.subscribe(sessionStorageCode);
-    
-        channel.bind('incoming-message', ({message, username}:Provider) => {
-            setMessageReceive((prev) => [...prev, {message, username}])
-        });
-    }, [sessionStorageCode]);
-
     useEffect(() => {
         if(!sessionStorageCode) return;
 
-        get(child(ref(database), `${sessionStorageCode}/chat`)).then((snapshot) => {
-            if (snapshot.exists()) {
+        const starCountRef = ref(database, `${sessionStorageCode}/chat`);
+        onValue(starCountRef, (snapshot) => {
+            if(snapshot.val()){
                 const data = [...Object.values(snapshot.val())] as Provider[];
-                setMessageReceive((prev) => [...prev, ...data])
-            } else {
-                //setMessageReceive((prev) => [...prev, { message:"Not Data", username:"Admin_Bot" }])
+                setMessageReceive(data);
             }
-        }).catch((error:any) => {
-            console.error(error);
         });
 
-        PusherLib();
-
-        return () => {
-            channel.unsubscribe(); //Only unsubscribe but keep the connection on.
-        };
-    }, [sessionStorageCode, PusherLib]);
+    }, [sessionStorageCode]);
 
     useEffect(() => {
         scrollToBottom();

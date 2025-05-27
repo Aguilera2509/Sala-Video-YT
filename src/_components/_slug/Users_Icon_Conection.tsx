@@ -5,29 +5,20 @@ import { useCallback, useEffect, useState } from "react";
 import { UsersIcon } from "../icons_slug/users_room";
 
 import { useSessionStorage } from "@/useCustoms/sessionStorage";
-import { ref, remove } from "firebase/database";
+import { onValue, ref, remove } from "firebase/database";
 import { database } from "@/_lib/firebaseApi/firebase_credentials";
-
-import { Channel } from "pusher-js";
-
-interface SubscriptionCountData {
-    subscription_count: number;
-};
-
-let channel:Channel;
 
 export function PlayersInRoom(){
     const [viewers, setViewers] = useState<number>(1);
     const [sessionStorageCode] = useSessionStorage("Code_Cinema_Room");
     const [sessionStorageUsername] = useSessionStorage("Username_Cinema_Room");
 
-    const PusherLib = async () => {
-        const pusherClient = (await import('@/_lib/pusherAPI/client_pusher')).default;
-    
-        channel = pusherClient.subscribe(sessionStorageCode);
-    
-        channel.bind("pusher:subscription_count", function(data:SubscriptionCountData){
-            setViewers(data.subscription_count);
+    const gettingViewers = async () => {
+        onValue(ref(database, `${sessionStorageCode}/users`), (snapshot) => {
+            if(snapshot.val()){
+                const data = snapshot.val();
+                setViewers(Object.keys(data).length);
+            };
         });
     };
     
@@ -39,7 +30,7 @@ export function PlayersInRoom(){
     useEffect(() => {
         if(!sessionStorageCode) return;
         
-        PusherLib();
+        gettingViewers();
 
         return() => {
             UserFirebase();

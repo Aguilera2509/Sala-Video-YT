@@ -19,6 +19,11 @@ export default function Home() {
     remove(room_db);
   };
 
+  const DetailsFirebase = (code:string) => {
+    const detailsVideo_db = ref(database, `${code}/details`);
+    remove(detailsVideo_db);
+  };
+
   const ChatFirebase = (code:string) => {
     const chat_db = ref(database, `${code}/chat`);
     remove(chat_db);
@@ -40,6 +45,7 @@ export default function Home() {
           if(data === null){
             RoomsFirebase(el);
             ChatFirebase(el);
+            DetailsFirebase(el);
           };
         });
       });

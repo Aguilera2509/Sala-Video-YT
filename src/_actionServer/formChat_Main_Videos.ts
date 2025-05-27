@@ -1,7 +1,5 @@
 "use server"
 
-import { pusherServer } from "@/_lib/pusherAPI/server_pusher";
-
 import { database } from "@/_lib/firebaseApi/firebase_credentials";
 import { ref, set } from "firebase/database";
 
@@ -19,9 +17,4 @@ export async function Send_Message({ sessionStorageCode, sessionStorageUsername,
     if(!sessionStorageCode) return;
 
     chat_room_db(sessionStorageUsername, message, sessionStorageCode);
-    
-    pusherServer.trigger(sessionStorageCode, 'incoming-message', {
-        username: sessionStorageUsername,
-        message
-    });
 };

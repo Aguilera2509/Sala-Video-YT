@@ -1,13 +1,22 @@
 "use server"
 
-import { pusherServer } from "@/_lib/pusherAPI/server_pusher"
+import { database } from "@/_lib/firebaseApi/firebase_credentials";
+import { DetailsOptionVideo } from "@/_lib/type";
+import { ref, set } from "firebase/database";
+
+function data_video_fb(sessionStorageCode:string, detailsVideo:DetailsOptionVideo){
+    set(ref(database, `${sessionStorageCode}/details`), {
+        currentTime: detailsVideo.currentTime,
+        volume: detailsVideo.volume,
+        pause: detailsVideo.pause,
+        speedVideo: detailsVideo.speedVideo
+    });
+};
 
 export async function Send_Data_VideoYT({ sessionStorageCode, detailsVideo }:
-    { sessionStorageCode:string, detailsVideo:{ currentTime:number, volume:number, pause:boolean, speedVideo:number } }
+    { sessionStorageCode:string, detailsVideo:DetailsOptionVideo }
 ) {
     if(!sessionStorageCode) return;
 
-    pusherServer.trigger(sessionStorageCode, 'incoming-data-video-yt', {
-        detailsVideo
-    });
+    data_video_fb(sessionStorageCode, detailsVideo);
 };
