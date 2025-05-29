@@ -39,6 +39,7 @@ export function Field_Message(){
 
     return(
         <form className="w-100" onSubmit={handleSubmit}>
+            <p className={`card mb-1 border border-0 p-1`} style={{backgroundColor: "#0e0e10", color: "white"}}>{sessionStorageUsername}</p>
             <input 
                 className={`form-control ${styleSlug.inputText}`} 
                 type="text"

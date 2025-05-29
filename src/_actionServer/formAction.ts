@@ -33,7 +33,7 @@ export async function serverActionCreateRoom(dataCreate:DataCreateState, index_r
             statusMessage: "Bad Request. Username must contain at least 3 letters"
         };
     
-        if(!/^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=([a-zA-Z0-9_-]+){11})(?:&.*)?$/.test(data.form.url_yt)) throw {
+        if(!/^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=([a-zA-Z0-9_-]+){11}|youtu\.be\/([a-zA-Z0-9_-]+){11}\?si=([a-zA-Z0-9_-]+))(?:&.*)?$/.test(data.form.url_yt)) throw {
             statusCode: 404,
             statusMessage: "Not Found. Make sure the url belongs to youtube or it be written correctly"
         };

@@ -39,6 +39,7 @@ const DETAILS_VIDEO:DetailsOptionVideo = {
     volume: 67,
     pause: true,
     speedVideo: 1,
+    count: 0, //Auxiliar
     //quality: "",
     //mute: false,
     //SphericalProperties: null
@@ -47,6 +48,8 @@ const DETAILS_VIDEO:DetailsOptionVideo = {
 ```
 
 **HOST** only can be sending that data, his own currentTime, volume, pause and speedV ideo because those details are most relevant details about the video.
+
+* Count is only a var to send and receive new data while the video is paused and validate the viewers doesn't go ahead of the **HOST** or too back.
 
 * Mute is not relevant to everyone if the **HOST** don't want to hear the video he can mute his own video and the viewers can still hear it.
 
@@ -71,7 +74,7 @@ After all This project is the product NOT the users.
 
 Actually this is a much better version of one of my previous projects due to:
 
-1. Better performance because when there is only one person into the room the server is not getting info to others users/viewers. It's the **HOST** is out then everyone can control his own video without **HOST**'s limitation being a little bit free, and the **HOST** if it's not alone into the room, it's always sending his options to the viewers, like volume, speedVideo, currentTime and pause every 1 second is the video is playing or every 4 second is the video is paused.
+1. Better performance because when there is only one person into the room the server is not getting info to others users/viewers. It's the **HOST** is out then everyone can control his own video without **HOST**'s limitation being a little bit free, and the **HOST** if it's not alone into the room it's always sending his options to the viewers, like volume, speedVideo, currentTime and pause every 1 second is the video is playing or every 4 second is the video is paused.
 
 2. Better Look because the previous version only counted with not responsive video or chat and a **Cinema Room** disgusting to the eye
 

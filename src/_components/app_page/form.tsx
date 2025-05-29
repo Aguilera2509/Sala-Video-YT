@@ -57,7 +57,8 @@ export function Form_CinemaRoom(){
         e.preventDefault();
         setLoading(true);
 
-        const code_video:string = dataCreate.form.url_yt.substring(32, 43);
+        const code_video:string = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=([a-zA-Z0-9_-]+){11})(?:&.*)?$/.test(dataCreate.form.url_yt) ? 
+            dataCreate.form.url_yt.substring(32, 43) :  /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/([a-zA-Z0-9_-]+){11}\?si=([a-zA-Z0-9_-]+))(?:&.*)?$/.test(dataCreate.form.url_yt) ? dataCreate.form.url_yt.substring(17, 28) : ""
         const index_room:number = rooms.findIndex(el => el === code_video);
 
         try {
@@ -211,7 +212,8 @@ export function Form_CinemaRoom(){
 
                         <label htmlFor="urlInput" className="form-label card-header">Url to Create Room</label>
                         <div className="card-body">
-                            <p className="card-text">Example: https://www.youtube.com/watch?v=Qw8D1FGhfwg </p>
+                            <p className="card-text">Example: https://www.youtube.com/watch?v=Qw8D1FGhfwg</p>
+                            <p className="card-text">Example: https://youtu.be/Qw8D1FGhfwg?si=DB3mVas7oxqrd2aR</p>
                             <input type="text" className="form-control" id="urlInput" name="url_yt" value={dataCreate.form.url_yt} onChange={handleChangeToCreate} placeholder="Url youtube's video" />
                             {dataCreate.error.statusCode === 404 &&
                                 <ShowErrMessages text={dataCreate.error.statusMessage} />

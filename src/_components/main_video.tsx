@@ -15,11 +15,17 @@ import { DetailsOptionVideo } from "@/_lib/type";
 const DETAILS_VIDEO:DetailsOptionVideo = {
     currentTime: 0,
     volume: 67,
-    pause: true,
+    pause: "null",
     speedVideo: 1,
+    count: 0,
     //quality: "",
     //mute: false,
     //SphericalProperties: null
+};
+
+interface YouTubeEvent {
+    target: YT.Player;
+    data: number;
 };
 
 export function Video_Youtube(){
@@ -30,7 +36,7 @@ export function Video_Youtube(){
     const [detailsVideo, setDetailsVideo] = useState<DetailsOptionVideo>(DETAILS_VIDEO);
 
     const timerInterval = useRef<NodeJS.Timeout | null>(null);
-    const timerIntervalValidatePause = useRef<NodeJS.Timeout | null>(null);
+    const timerIntervalPause = useRef<NodeJS.Timeout | null>(null);
     const playerInstance = useRef<YT.Player | null>(null);
 
     const [playerIsReady, setPlayerIsReady] = useState<boolean>(false);
@@ -53,14 +59,14 @@ export function Video_Youtube(){
 
     function onPlayerReady(){
         setPlayerIsReady(true);
-        //Functio active inmediately when the video is loaded.
+        //Function active inmediately when the video is loaded.
     };
 
-    function onPlayerStateChange(event:any){
+    function onPlayerStateChange(event:YouTubeEvent){
         if(JSON.parse(sessionStorageHost) && event.data === window.YT.PlayerState.PLAYING){
-            if(timerIntervalValidatePause.current){
-                clearInterval(timerIntervalValidatePause.current);
-            };
+            if(timerIntervalPause.current){
+                clearInterval(timerIntervalPause.current);
+            }
 
             timerInterval.current = setInterval(()=> {
                 //console.log(event.target.getSphericalProperties());// Thinking
@@ -85,33 +91,22 @@ export function Video_Youtube(){
                 pause: true,
             }));
 
-            timerIntervalValidatePause.current = setInterval(()=> {
+            timerIntervalPause.current = setInterval(() => {
                 setDetailsVideo((prev) => ({
-                    ...prev,
-                    pause: true,
-                }));
+                ...prev,
+                pause: true,
+                count: prev.count + 1,
+            }));
             }, 4000);
         };
 
         if(JSON.parse(sessionStorageHost) && event.data === window.YT.PlayerState.ENDED){
             if(timerInterval.current){
                 clearInterval(timerInterval.current);
-            };
-            if(timerIntervalValidatePause.current){
-                clearInterval(timerIntervalValidatePause.current);
-            };
-
-            /*setDetailsVideo((prev) => ({
-                ...prev,
-                pause: true,
-            }));*/
-
-            /*timerIntervalValidatePause.current = setInterval(()=> {
-                setDetailsVideo((prev) => ({
-                    ...prev,
-                    pause: true,
-                }));
-            }, 4000);*/
+            }
+            if(timerIntervalPause.current){
+                clearInterval(timerIntervalPause.current);
+            }
         };
     };
 
@@ -136,7 +131,7 @@ export function Video_Youtube(){
     };*/
 
     useEffect(() => {
-        if(!playerIsReady || users.length === 1 || !playerInstance.current) return;
+        if(!playerIsReady || users.length === 1 || !playerInstance.current || !sessionStorageCode) return;
 
         if(JSON.parse(sessionStorageHost)){
             Send_Data_VideoYT({ sessionStorageCode, detailsVideo });
@@ -144,30 +139,41 @@ export function Video_Youtube(){
             //console.log(player);
             //console.log(player.isMuted());
         }else{
-            playerInstance.current.setVolume(detailsVideo.volume);
-            playerInstance.current.setPlaybackRate(detailsVideo.speedVideo);
-
-            if(Math.floor((playerInstance.current.getCurrentTime()-detailsVideo.currentTime)) <= -6){
-                playerInstance.current.seekTo(detailsVideo.currentTime, true);
-            }else if(Math.floor((playerInstance.current.getCurrentTime()-detailsVideo.currentTime)) >= 4){
-                playerInstance.current.seekTo(detailsVideo.currentTime, true);
-            }else{
-                playerInstance.current.playVideo();
-            };
-
             if(detailsVideo.pause){
                 playerInstance.current.pauseVideo();
-            }else{
+
+                playerInstance.current.setVolume(detailsVideo.volume);
+                playerInstance.current.setPlaybackRate(detailsVideo.speedVideo);
+
+                if(Math.floor((playerInstance.current.getCurrentTime()-detailsVideo.currentTime)) <= -6){
+                    playerInstance.current.seekTo(detailsVideo.currentTime, true);
+                }else if(Math.floor((playerInstance.current.getCurrentTime()-detailsVideo.currentTime)) >= 4){
+                    playerInstance.current.seekTo(detailsVideo.currentTime, true);
+                }
+
+            }else if(!detailsVideo.pause){
                 playerInstance.current.playVideo();
+
+                playerInstance.current.setVolume(detailsVideo.volume);
+                playerInstance.current.setPlaybackRate(detailsVideo.speedVideo);
+
+                if(Math.floor((playerInstance.current.getCurrentTime()-detailsVideo.currentTime)) <= -6){
+                    playerInstance.current.seekTo(detailsVideo.currentTime, true);
+                }else if(Math.floor((playerInstance.current.getCurrentTime()-detailsVideo.currentTime)) >= 4){
+                    playerInstance.current.seekTo(detailsVideo.currentTime, true);
+                }
+
+            }else if(detailsVideo.pause === "null"){
+                playerInstance.current.stopVideo();
             };
         };
-    }, [detailsVideo, playerIsReady, sessionStorageCode, users]);
+    }, [detailsVideo, playerIsReady, sessionStorageCode, users, playerInstance]);
 
     const gettingDetailsVideo = async () => {
         onValue(ref(database, `${sessionStorageCode}/details`), (snapshot) => {
             if(snapshot.val()){
                 const data:DetailsOptionVideo = snapshot.val();
-                setDetailsVideo((prev) => ({...prev, currentTime: data.currentTime, volume: data.volume, pause: data.pause, speedVideo: data.speedVideo }));
+                setDetailsVideo((prev) => ({...prev, currentTime: data.currentTime, volume: data.volume, pause: data.pause, speedVideo: data.speedVideo, count: data.count }));
             }
         });
     };
@@ -202,13 +208,13 @@ export function Video_Youtube(){
             clearTimeout(timer);
             if(timerInterval.current){
                 clearInterval(timerInterval.current);
-            };
-            if(timerIntervalValidatePause.current){
-                clearInterval(timerIntervalValidatePause.current);
-            };
+            }
+            if(timerIntervalPause.current){
+                clearInterval(timerIntervalPause.current);
+            }
             if(playerInstance.current){
                 playerInstance.current.destroy();
-            };
+            }
         };
     }, [sessionStorageCode]);
 

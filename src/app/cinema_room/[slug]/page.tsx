@@ -32,7 +32,7 @@ export default function Cinema_Room(){
         <div className={`container-fluid`} style={{"overflowY": "clip"}}>
             <div className={`row`}>
 
-                <div className={`col-lg-9 col-md-8 text-white ${styleSlug.paddins} ${styleSlug.heightVideo}`}>
+                <div className={`col-lg-9 col-md-8 ${styleSlug.paddins} ${styleSlug.heightVideo}`}>
                    <Video_Youtube />
                 </div>
 

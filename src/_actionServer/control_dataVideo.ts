@@ -9,7 +9,8 @@ function data_video_fb(sessionStorageCode:string, detailsVideo:DetailsOptionVide
         currentTime: detailsVideo.currentTime,
         volume: detailsVideo.volume,
         pause: detailsVideo.pause,
-        speedVideo: detailsVideo.speedVideo
+        speedVideo: detailsVideo.speedVideo,
+        count: detailsVideo.count
     });
 };
 

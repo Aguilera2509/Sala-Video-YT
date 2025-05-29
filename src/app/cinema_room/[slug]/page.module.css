@@ -79,22 +79,27 @@
 
 @media screen and (max-width: 767px){
     .columnRightChat{
-        height: 70%;
+        height: 50vh;
         border: 2px solid #18181b;
     }
     .columnRightTop{
-        height: 20%;
+        height: 14vh;
         display: grid;
         place-items: center;
         border: 2px solid #18181b;
     }
+    .columnRightBottom{
+        height: auto;
+        display: unset;
+        border: 2px solid #18181b;
+    }
     
     .heightVideo{
-        height: 30vh !important;
+        height: 28vh !important;
     }
     
     .heightRightPanel{
-        height: 70vh !important;
+        height: 100% !important;
     }
 }
 

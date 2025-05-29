@@ -33,8 +33,9 @@ export interface DataCreateState {
 export interface DetailsOptionVideo {
     currentTime: number;
     volume: number;
-    pause: boolean;
+    pause: boolean | "null";
     speedVideo: number;
+    count: number;
     // quality?: string;  // Optional property (commented out)
     // mute?: boolean;     // Optional property (commented out)
     // SphericalProperties?: null; // Consider a more specific type if needed
