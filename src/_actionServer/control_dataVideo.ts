@@ -8,6 +8,7 @@ function data_video_fb(sessionStorageCode:string, detailsVideo:DetailsOptionVide
     set(ref(database, `${sessionStorageCode}/details`), {
         currentTime: detailsVideo.currentTime,
         volume: detailsVideo.volume,
+        mute: detailsVideo.mute,
         pause: detailsVideo.pause,
         speedVideo: detailsVideo.speedVideo,
         count: detailsVideo.count

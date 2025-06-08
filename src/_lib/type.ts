@@ -1,8 +1,4 @@
-export interface DataJoinState {
-    form: {
-        username: string;
-        code: string;
-    };
+interface responseData{
     error: {
         statusCode: number;
         statusMessage: string;
@@ -14,19 +10,17 @@ export interface DataJoinState {
     };
 };
 
-export interface DataCreateState {
+export interface DataJoinState extends responseData {
+    form: {
+        username: string;
+        code: string;
+    };
+};
+
+export interface DataCreateState extends responseData {
     form: {
         username: string;
         url_yt: string;
-    };
-    error: {
-        statusCode: number;
-        statusMessage: string;
-    };
-    success: {
-        code_video: string;
-        username_video: string;
-        host: string;
     };
 };
 
@@ -36,7 +30,7 @@ export interface DetailsOptionVideo {
     pause: boolean | "null";
     speedVideo: number;
     count: number;
+    mute: boolean;
     // quality?: string;  // Optional property (commented out)
-    // mute?: boolean;     // Optional property (commented out)
     // SphericalProperties?: null; // Consider a more specific type if needed
 }

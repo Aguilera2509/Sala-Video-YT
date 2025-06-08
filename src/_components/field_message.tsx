@@ -22,17 +22,19 @@ interface MessageFormElement extends HTMLFormElement {
 interface Provider {
     username: string,
     message: string,
+    host: string
 };
 
 export function Field_Message(){
     const [sessionStorageCode] = useSessionStorage("Code_Cinema_Room");
+    const [sessionStorageHost] = useSessionStorage("Host_Cinema_Room");
     const [sessionStorageUsername] = useSessionStorage("Username_Cinema_Room");
     const formRef = useRef<HTMLInputElement | null>(null);
 
-    async function handleSubmit(e: FormEvent<HTMLFormElement>){
-        e.preventDefault()
+    function handleSubmit(e: FormEvent<HTMLFormElement>){
+        e.preventDefault();
 
-        Send_Message( { sessionStorageCode, sessionStorageUsername, message: formRef.current!.value } );
+        Send_Message( { sessionStorageCode, sessionStorageUsername, sessionStorageHost, message: formRef.current!.value } );
         
         formRef.current!.value = "";
     };
@@ -43,7 +45,7 @@ export function Field_Message(){
             <input 
                 className={`form-control ${styleSlug.inputText}`} 
                 type="text"
-                id="messageInput"
+                //id="messageInput"
                 ref={formRef}
                 placeholder="Start typing here" 
             />
@@ -81,8 +83,8 @@ export function Field_Show_Message(){
         <>
             {
                 messageReceive.map((el, i:number) => (
-                    <div className="card text-bg-dark mb-3 text-start" key={i}>
-                        <div className="card-header text-warning">{el.username}</div>
+                    <div className="card text-bg-dark mb-2 text-start" key={i}>
+                        <div className="card-header text-warning">{JSON.parse(el.host) ? el.username + " [HOST]" : el.username}</div>
                         <div className="card-body">
                             <p className="card-text">{el.message}</p>
                         </div>

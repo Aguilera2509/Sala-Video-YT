@@ -3,6 +3,7 @@
 import styleSlug from "../app/cinema_room/[slug]/page.module.css";
 
 import { useSessionStorage } from "@/useCustoms/sessionStorage";
+import useMobile from "@/useCustoms/sessionMobile";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -12,26 +13,33 @@ import { onValue, ref, set } from "firebase/database";
 
 import { DetailsOptionVideo } from "@/_lib/type";
 
-const DETAILS_VIDEO:DetailsOptionVideo = {
-    currentTime: 0,
-    volume: 67,
-    pause: "null",
-    speedVideo: 1,
-    count: 0,
-    //quality: "",
-    //mute: false,
-    //SphericalProperties: null
+declare global {
+    var playerInstanceGlogal: YT.Player | null; 
 };
+
+global.playerInstanceGlogal = null;
 
 interface YouTubeEvent {
     target: YT.Player;
     data: number;
 };
 
-export function Video_Youtube(){
+const DETAILS_VIDEO:DetailsOptionVideo = {
+    currentTime: 0,
+    volume: 67,
+    pause: "null",
+    speedVideo: 1,
+    count: 0,
+    mute: false,
+    //quality: "",
+    //SphericalProperties: null
+};
+
+export default function Video_Youtube(){
     const [sessionStorageCode] = useSessionStorage("Code_Cinema_Room");
     const [sessionStorageUsername] = useSessionStorage("Username_Cinema_Room");
     const [sessionStorageHost] = useSessionStorage("Host_Cinema_Room");
+    const isMobile = useMobile();
 
     const [detailsVideo, setDetailsVideo] = useState<DetailsOptionVideo>(DETAILS_VIDEO);
 
@@ -41,18 +49,16 @@ export function Video_Youtube(){
 
     const [playerIsReady, setPlayerIsReady] = useState<boolean>(false);
 
-    const [users, setUsers] = useState<string[]>([]);
-    //const [errorPlayer, setErrorPlayer] = useState<string>("");
+    const [viewers, setViewers] = useState<number>(0);
 
     const onYouTubeIframeAPIReady = () => {
-        playerInstance.current = new window.YT.Player('main_video', {
+        global.playerInstanceGlogal = playerInstance.current = new window.YT.Player('main_video', {
             videoId: sessionStorageCode,
             host: 'https://www.youtube-nocookie.com',
             playerVars: { 'modestbranding': 0,'enablejsapi': 1, 'origin': window.location.href },
             events: {
                 'onReady': onPlayerReady,
                 'onStateChange': onPlayerStateChange,
-                //'onError': onPlayerError
             }
         });
     };
@@ -61,22 +67,22 @@ export function Video_Youtube(){
         setPlayerIsReady(true);
         //Function active inmediately when the video is loaded.
     };
-
+    
     function onPlayerStateChange(event:YouTubeEvent){
         if(JSON.parse(sessionStorageHost) && event.data === window.YT.PlayerState.PLAYING){
             if(timerIntervalPause.current){
                 clearInterval(timerIntervalPause.current);
             }
-
             timerInterval.current = setInterval(()=> {
                 //console.log(event.target.getSphericalProperties());// Thinking
                 setDetailsVideo((prev) => ({
                     ...prev,
                     currentTime: Math.floor(event.target.getCurrentTime()),
-                    volume: event.target.getVolume(),
+                    volume: isMobile ? global.volume : event.target.getVolume(),
                     pause: false,
-                    //quality: event.target.getPlaybackQuality(), //Option no longder support by Youtube, No matter if you get the quality, setPlaybackQuality wont have any effect
+                    mute: event.target.isMuted(),
                     speedVideo: event.target.getPlaybackRate(),
+                    //quality: event.target.getPlaybackQuality(), //Option no longder support by Youtube, No matter if you get the quality, setPlaybackQuality wont have any effect
                 }));
             }, 1000);
         };
@@ -110,38 +116,30 @@ export function Video_Youtube(){
         };
     };
 
-    /*function onPlayerError(event:any){
-        switch (event.data) {
-            case 2:
-                setErrorPlayer("Error: Invalid video ID.");
-                break;
-            case 5:
-                setErrorPlayer("Error: HTML5 playback error.");
-                break;
-            case 100:
-                setErrorPlayer("Error: Video not found.");
-                break;
-            case 101:
-            case 150:
-                console.error("Error: Playback not allowed by the video owner.");
-                break;
-            default:
-                setErrorPlayer("Error: An unexpected error occurred.");
-        }
-    };*/
-
     useEffect(() => {
-        if(!playerIsReady || users.length === 1 || !playerInstance.current || !sessionStorageCode) return;
+        if(playerInstance.current && isMobile && JSON.parse(sessionStorageHost) && viewers === 1){
+            playerInstance.current.setVolume(detailsVideo.volume);
+        };
+
+        if(!playerIsReady || viewers === 1 || !playerInstance.current || !sessionStorageCode) return;
 
         if(JSON.parse(sessionStorageHost)){
             Send_Data_VideoYT({ sessionStorageCode, detailsVideo });
+            if(isMobile){
+                playerInstance.current.setVolume(detailsVideo.volume);
+            }
             //console.log(window.YT.PlayerState);
             //console.log(player);
-            //console.log(player.isMuted());
         }else{
             if(detailsVideo.pause){
                 playerInstance.current.pauseVideo();
 
+                if(detailsVideo.mute){
+                    playerInstance.current.mute();
+                }else{
+                    playerInstance.current.unMute();
+                };
+
                 playerInstance.current.setVolume(detailsVideo.volume);
                 playerInstance.current.setPlaybackRate(detailsVideo.speedVideo);
 
@@ -149,11 +147,17 @@ export function Video_Youtube(){
                     playerInstance.current.seekTo(detailsVideo.currentTime, true);
                 }else if(Math.floor((playerInstance.current.getCurrentTime()-detailsVideo.currentTime)) >= 4){
                     playerInstance.current.seekTo(detailsVideo.currentTime, true);
-                }
+                };
 
             }else if(!detailsVideo.pause){
                 playerInstance.current.playVideo();
 
+                if(detailsVideo.mute){
+                    playerInstance.current.mute();
+                }else{
+                    playerInstance.current.unMute();
+                };
+                
                 playerInstance.current.setVolume(detailsVideo.volume);
                 playerInstance.current.setPlaybackRate(detailsVideo.speedVideo);
 
@@ -161,20 +165,37 @@ export function Video_Youtube(){
                     playerInstance.current.seekTo(detailsVideo.currentTime, true);
                 }else if(Math.floor((playerInstance.current.getCurrentTime()-detailsVideo.currentTime)) >= 4){
                     playerInstance.current.seekTo(detailsVideo.currentTime, true);
-                }
+                };
 
             }else if(detailsVideo.pause === "null"){
                 playerInstance.current.stopVideo();
             };
         };
-    }, [detailsVideo, playerIsReady, sessionStorageCode, users, playerInstance]);
+    }, [detailsVideo, playerIsReady, sessionStorageCode, viewers, playerInstance]);
 
     const gettingDetailsVideo = async () => {
         onValue(ref(database, `${sessionStorageCode}/details`), (snapshot) => {
             if(snapshot.val()){
                 const data:DetailsOptionVideo = snapshot.val();
-                setDetailsVideo((prev) => ({...prev, currentTime: data.currentTime, volume: data.volume, pause: data.pause, speedVideo: data.speedVideo, count: data.count }));
+                setDetailsVideo((prev) => ({...prev, currentTime: data.currentTime, volume: data.volume, mute:data.mute, pause: data.pause, speedVideo: data.speedVideo, count: data.count }));
             }
+        });
+    };
+
+    const Firebase = () => {
+        //Refresh page erase users db, this both set send tha user_data again. 
+        set(ref(database, `${sessionStorageCode}/users/` + sessionStorageUsername), { 
+            username: sessionStorageUsername
+        });
+        set(ref(database, `rooms/${sessionStorageCode}`), { 
+            code_video: sessionStorageCode
+        });
+
+        //When only into the room is the host, this help to avoid oversend data to firebase due to if Viewers === 1 return (useEffect Line 114);
+        onValue(ref(database, `${sessionStorageCode}/users`), (snapshot) => {
+            const data = snapshot.val();
+            if(data === null) return setViewers(1);
+            setViewers(Object.keys(data).length);
         });
     };
 
@@ -191,18 +212,7 @@ export function Video_Youtube(){
             };
         }, 1000);
 
-        set(ref(database, `${sessionStorageCode}/users/` + sessionStorageUsername), { 
-            username: sessionStorageUsername
-        });
-        set(ref(database, `rooms/${sessionStorageCode}`), { 
-            code_video: sessionStorageCode
-        });
-
-        onValue(ref(database, `${sessionStorageCode}/users`), (snapshot) => {
-            const data = snapshot.val();
-            if(data === null) return setUsers([]);
-            setUsers(Object.keys(data));
-        });
+        Firebase();
 
         return () => {
             clearTimeout(timer);
@@ -214,6 +224,7 @@ export function Video_Youtube(){
             }
             if(playerInstance.current){
                 playerInstance.current.destroy();
+                global.playerInstanceGlogal!.destroy();
             }
         };
     }, [sessionStorageCode]);
