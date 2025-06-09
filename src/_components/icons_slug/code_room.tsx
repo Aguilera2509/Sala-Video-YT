@@ -1,6 +1,6 @@
 'use client';
 
-import { useSessionStorage } from '@/useCustoms/sessionStorage';
+import useSessionStorage from '@/useCustoms/sessionStorage';
 import type { Variants } from 'motion/react';
 import { motion, useAnimation } from 'motion/react';
 import type { HTMLAttributes } from 'react';

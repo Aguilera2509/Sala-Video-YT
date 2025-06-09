@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 
 import styleSlug from "../app/cinema_room/[slug]/page.module.css";
 
-import { useSessionStorage } from "@/useCustoms/sessionStorage";
+import useSessionStorage from "@/useCustoms/sessionStorage";
 
 import { Send_Message } from "@/_actionServer/formChat_Main_Videos";
 

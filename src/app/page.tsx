@@ -70,7 +70,8 @@ export default function Home() {
             <p className="h5">If you decide to join the room, only enter the room&apos;s code shared by your friend</p>
             <p className="h5">Into the room you have a chat that contains the code, viewers and exit option upon it</p>
             <p className="h5">And only who create the room can manage the video to all of you while its runnig/playing or pause</p>
-            <p style={{paddingBottom: "3.2rem"}} className="h5">When the video get ended everyone is free to handle its own video&apos;s options while the HOST not handle its video</p>
+            <p className="h5">When the video get ended everyone is free to handle its own video&apos;s options while the HOST not handling its video</p>
+            <p style={{paddingBottom: "3.2rem"}} className="h5">If you are using a mobile to join in you&apos;ll get an input to manage the global volume, the volume of video and your mobile will be splitted</p>
           </div>
         </div>
       </div>

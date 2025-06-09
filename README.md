@@ -33,34 +33,30 @@ The dependencies of this project are:
 # About code
 
 ```ts
-
 const DETAILS_VIDEO:DetailsOptionVideo = {
     currentTime: 0,
     volume: 67,
     pause: true,
     speedVideo: 1,
     count: 0, //Auxiliar
+    mute: false,
     //quality: "",
-    //mute: false,
     //SphericalProperties: null
 };
-
 ```
 
 **HOST** only can be sending that data, his own currentTime, volume, pause and speedV ideo because those details are most relevant details about the video.
 
 * Count is only a var to send and receive new data while the video is paused and validate the viewers doesn't go ahead of the **HOST** or too back.
 
-* Mute is not relevant to everyone if the **HOST** don't want to hear the video he can mute his own video and the viewers can still hear it.
-
 * Quality is deprecated as they say here: 
 [YouTube's Api](https://developers.google.com/youtube/iframe_api_reference)
 
 > October 24, 2019 ->
-The documentation has been updated to reflect the fact that the API no longer supports functions for setting or retrieving playback quality. To give you the best viewing experience, YouTube adjusts the quality of your video stream based on your viewing conditions.
+The documentation has been updated to reflect the fact that the API no longer supports functions for setting or retrieving playback quality. To give you the best viewing experience, YouTube adjusts the quality of your video stream based on your viewing conditions. <br>
 The changes explained below have been in effect for more than one year. This update merely aligns the documentation with current functionality:
-The getPlaybackQuality, setPlaybackQuality, and getAvailableQualityLevels functions are no longer supported. In particular, calls to setPlaybackQuality will be no-op functions, meaning they will not actually have any impact on the viewer's playback experience.
-The queueing functions for videos and playlists -- cueVideoById, loadVideoById, etc. -- no longer support the suggestedQuality argument. Similarly, if you call those functions using object syntax, the suggestedQuality field is no longer supported. If suggestedQuality is specified, it will be ignored when the request is handled. It will not generate any warnings or errors.
+The getPlaybackQuality, setPlaybackQuality, and getAvailableQualityLevels functions are no longer supported. In particular, calls to setPlaybackQuality will be no-op functions, meaning they will not actually have any impact on the viewer's playback experience. <br>
+The queueing functions for videos and playlists -- cueVideoById, loadVideoById, etc. -- no longer support the suggestedQuality argument. Similarly, if you call those functions using object syntax, the suggestedQuality field is no longer supported. If suggestedQuality is specified, it will be ignored when the request is handled. It will not generate any warnings or errors. <br>
 The onPlaybackQualityChange event is still supported and might signal a change in the viewer's playback environment. See the Help Center article referenced above for more information about factors that affect playback conditions or that might cause the event to fire.
 
 * SphericalProperties is not added
@@ -80,6 +76,12 @@ Actually this is a much better version of one of my previous projects due to:
 
 3. Better Info due to now the **Cinema Room** count with a nav-bar where you can see the viewers into the room that you are in, **CODE** to share and an exit button.
 
+4. This new Version can be seen very well and handle video's options from Desktop, Tablet, Laptop and Phone.
+
 >**Note: The previous version is not associated to this new version.** 
 
-attaching images soon..
+<img src="./public/version_old_images/CaptureOldImg.webp" alt="How it Looked Menu" width="540" height="330">
+
+<img src="./public/version_old_images/CaptureOldImg2.webp" alt="How it Looked Cinema_Room" width="540" height="330">
+
+> **Only 2 images that i have**

@@ -2,7 +2,7 @@
 
 import styleSlug from "../app/cinema_room/[slug]/page.module.css";
 
-import { useSessionStorage } from "@/useCustoms/sessionStorage";
+import useSessionStorage from "@/useCustoms/sessionStorage";
 import useMobile from "@/useCustoms/sessionMobile";
 
 import { useEffect, useRef, useState } from "react";
@@ -14,10 +14,10 @@ import { onValue, ref, set } from "firebase/database";
 import { DetailsOptionVideo } from "@/_lib/type";
 
 declare global {
-    var playerInstanceGlogal: YT.Player | null; 
+    interface Window {
+        playerInstanceGlobal: YT.Player; 
+    }
 };
-
-global.playerInstanceGlogal = null;
 
 interface YouTubeEvent {
     target: YT.Player;
@@ -52,7 +52,7 @@ export default function Video_Youtube(){
     const [viewers, setViewers] = useState<number>(0);
 
     const onYouTubeIframeAPIReady = () => {
-        global.playerInstanceGlogal = playerInstance.current = new window.YT.Player('main_video', {
+        playerInstance.current = new window.YT.Player('main_video', {
             videoId: sessionStorageCode,
             host: 'https://www.youtube-nocookie.com',
             playerVars: { 'modestbranding': 0,'enablejsapi': 1, 'origin': window.location.href },
@@ -61,6 +61,10 @@ export default function Video_Youtube(){
                 'onStateChange': onPlayerStateChange,
             }
         });
+
+        if(isMobile){
+            window.playerInstanceGlobal = playerInstance.current;
+        };
     };
 
     function onPlayerReady(){
@@ -78,7 +82,7 @@ export default function Video_Youtube(){
                 setDetailsVideo((prev) => ({
                     ...prev,
                     currentTime: Math.floor(event.target.getCurrentTime()),
-                    volume: isMobile ? global.volume : event.target.getVolume(),
+                    volume: isMobile ? window.volume : event.target.getVolume(),
                     pause: false,
                     mute: event.target.isMuted(),
                     speedVideo: event.target.getPlaybackRate(),
@@ -114,6 +118,32 @@ export default function Video_Youtube(){
                 clearInterval(timerIntervalPause.current);
             }
         };
+    };
+
+    const gettingDetailsVideo = async () => {
+        onValue(ref(database, `${sessionStorageCode}/details`), (snapshot) => {
+            if(snapshot.val()){
+                const data:DetailsOptionVideo = snapshot.val();
+                setDetailsVideo((prev) => ({...prev, currentTime: data.currentTime, volume: data.volume, mute:data.mute, pause: data.pause, speedVideo: data.speedVideo, count: data.count }));
+            }
+        });
+    };
+
+    const Firebase = () => {
+        //Refresh page erase users db, this both set send tha user_data again. 
+        set(ref(database, `${sessionStorageCode}/users/` + sessionStorageUsername), { 
+            username: sessionStorageUsername
+        });
+        set(ref(database, `rooms/${sessionStorageCode}`), { 
+            code_video: sessionStorageCode
+        });
+
+        //When only into the room is the host, this help to avoid oversend data to firebase due to if Viewers === 1 return (useEffect Line 114);
+        onValue(ref(database, `${sessionStorageCode}/users`), (snapshot) => {
+            const data = snapshot.val();
+            if(data === null) return setViewers(1);
+            setViewers(Object.keys(data).length);
+        });
     };
 
     useEffect(() => {
@@ -171,37 +201,11 @@ export default function Video_Youtube(){
                 playerInstance.current.stopVideo();
             };
         };
-    }, [detailsVideo, playerIsReady, sessionStorageCode, viewers, playerInstance]);
-
-    const gettingDetailsVideo = async () => {
-        onValue(ref(database, `${sessionStorageCode}/details`), (snapshot) => {
-            if(snapshot.val()){
-                const data:DetailsOptionVideo = snapshot.val();
-                setDetailsVideo((prev) => ({...prev, currentTime: data.currentTime, volume: data.volume, mute:data.mute, pause: data.pause, speedVideo: data.speedVideo, count: data.count }));
-            }
-        });
-    };
-
-    const Firebase = () => {
-        //Refresh page erase users db, this both set send tha user_data again. 
-        set(ref(database, `${sessionStorageCode}/users/` + sessionStorageUsername), { 
-            username: sessionStorageUsername
-        });
-        set(ref(database, `rooms/${sessionStorageCode}`), { 
-            code_video: sessionStorageCode
-        });
-
-        //When only into the room is the host, this help to avoid oversend data to firebase due to if Viewers === 1 return (useEffect Line 114);
-        onValue(ref(database, `${sessionStorageCode}/users`), (snapshot) => {
-            const data = snapshot.val();
-            if(data === null) return setViewers(1);
-            setViewers(Object.keys(data).length);
-        });
-    };
+    }, [detailsVideo, playerIsReady, sessionStorageCode, viewers, playerInstance, isMobile, sessionStorageHost]);
 
     useEffect(() => {
         if(!sessionStorageCode) return;
-        
+
         const timer = setTimeout(() => {
             if(window.YT){
                 onYouTubeIframeAPIReady();
@@ -224,7 +228,9 @@ export default function Video_Youtube(){
             }
             if(playerInstance.current){
                 playerInstance.current.destroy();
-                global.playerInstanceGlogal!.destroy();
+            }
+            if(window.playerInstanceGlobal){
+                window.playerInstanceGlobal.destroy();
             }
         };
     }, [sessionStorageCode]);

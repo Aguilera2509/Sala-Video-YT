@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
-import { useSessionStorage } from "@/useCustoms/sessionStorage";
+import useSessionStorage from "@/useCustoms/sessionStorage";
 
 import { serverActionCreateRoom, serverActionJoinRoom } from "@/_actionServer/formAction";
 import { database } from "@/_lib/firebaseApi/firebase_credentials";

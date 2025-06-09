@@ -9,13 +9,15 @@ import { CodeRoom } from "@/_components/_slug/Code_Icon_Conection";
 
 import Video_Youtube from "@/_components/main_video";
 import { Field_Message, Field_Show_Message } from "@/_components/field_message";
-import Field_Mobile  from "@/_components/field_volumen_mobile";
 
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
-import { useSessionStorage } from "@/useCustoms/sessionStorage";
+import useSessionStorage from "@/useCustoms/sessionStorage";
 import useMobile from "@/useCustoms/sessionMobile";
+
+const Field_Mobile = dynamic(() => import("@/_components/field_volumen_mobile"));
 
 export default function Cinema_Room(){
     const router = useRouter();

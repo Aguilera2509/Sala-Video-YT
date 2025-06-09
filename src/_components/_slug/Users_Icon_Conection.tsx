@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import { UsersIcon } from "../icons_slug/users_room";
 
-import { useSessionStorage } from "@/useCustoms/sessionStorage";
+import useSessionStorage from "@/useCustoms/sessionStorage";
+
 import { onValue, ref, remove } from "firebase/database";
 import { database } from "@/_lib/firebaseApi/firebase_credentials";
 

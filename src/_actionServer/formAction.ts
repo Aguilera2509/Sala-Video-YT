@@ -54,7 +54,7 @@ export async function serverActionCreateRoom(dataCreate:DataCreateState, index_r
             }
         };
 
-    } catch (error:any) {
+    } catch (error) {
         const customError: CustomError = {
             statusCode: (error as CustomError).statusCode || 500,
             statusMessage: (error as CustomError).statusMessage || "An unexpected error occurred"
@@ -123,7 +123,7 @@ export async function serverActionJoinRoom(dataJoin: DataJoinState, index_userna
             }
         };
 
-    } catch (error:any) {
+    } catch (error) {
         const customError: CustomError = {
             statusCode: (error as CustomError).statusCode || 500,
             statusMessage: (error as CustomError).statusMessage || "An unexpected error occurred"

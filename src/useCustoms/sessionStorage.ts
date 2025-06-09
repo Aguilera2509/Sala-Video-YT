@@ -23,6 +23,4 @@ function useSessionStorage(key:string){
     return [value, setSessionValue] as const;
 };
 
-export {
-    useSessionStorage
-};
+export default useSessionStorage;
