@@ -6,10 +6,9 @@ import styleSlug from "../app/cinema_room/[slug]/page.module.css";
 
 import useSessionStorage from "@/useCustoms/sessionStorage";
 
-import { Send_Message } from "@/_actionServer/formChat_Main_Videos";
-
-import { onValue, ref } from "firebase/database";
+import { onValue, ref, set } from "firebase/database";
 import { database } from "@/_lib/firebaseApi/firebase_credentials";
+import { Send_Message } from "@/_actionServer/formChat_Main_Videos";
 
 /*interface FormElements extends HTMLFormControlsCollection {
     messageInput: HTMLInputElement
@@ -30,11 +29,16 @@ export function Field_Message(){
     const [sessionStorageHost] = useSessionStorage("Host_Cinema_Room");
     const [sessionStorageUsername] = useSessionStorage("Username_Cinema_Room");
     const formRef = useRef<HTMLInputElement | null>(null);
-
-    function handleSubmit(e: FormEvent<HTMLFormElement>){
+    
+    async function handleSubmit(e: FormEvent<HTMLFormElement>){
         e.preventDefault();
 
-        Send_Message( { sessionStorageCode, sessionStorageUsername, sessionStorageHost, message: formRef.current!.value } );
+        if(!sessionStorageCode || formRef.current!.value.trim().length === 0){
+            formRef.current!.value = "";
+            return;
+        };
+
+        await Send_Message({ sessionStorageCode, sessionStorageUsername, sessionStorageHost, message:formRef.current!.value });
         
         formRef.current!.value = "";
     };
