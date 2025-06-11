@@ -13,15 +13,6 @@ export function PlayersInRoom(){
     const [viewers, setViewers] = useState<number>(1);
     const [sessionStorageCode] = useSessionStorage("Code_Cinema_Room");
     const [sessionStorageUsername] = useSessionStorage("Username_Cinema_Room");
-
-    const gettingViewers = async () => {
-        onValue(ref(database, `${sessionStorageCode}/users`), (snapshot) => {
-            if(snapshot.val()){
-                const data = snapshot.val();
-                setViewers(Object.keys(data).length);
-            };
-        });
-    };
     
     const UserFirebase = useCallback(() => {
         const user_db = ref(database, `${sessionStorageCode}/users/${sessionStorageUsername}`);
@@ -30,6 +21,15 @@ export function PlayersInRoom(){
 
     useEffect(() => {
         if(!sessionStorageCode) return;
+
+        const gettingViewers = () => {
+            onValue(ref(database, `${sessionStorageCode}/users`), (snapshot) => {
+                if(snapshot.val()){
+                    const data = snapshot.val();
+                    setViewers(Object.keys(data).length);
+                };
+            });
+        };
         
         gettingViewers();
 
