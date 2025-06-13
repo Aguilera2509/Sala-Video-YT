@@ -200,7 +200,8 @@ export default function Video_Youtube(){
         const Firebase = () => {
             //Refresh page erase users db, this both set send tha user_data again. 
             set(ref(database, `${sessionStorageCode}/users/` + sessionStorageUsername), { 
-                username: sessionStorageUsername
+                username: sessionStorageUsername,
+                host: JSON.parse(sessionStorageHost)
             });
             set(ref(database, `rooms/${sessionStorageCode}`), { 
                 code_video: sessionStorageCode

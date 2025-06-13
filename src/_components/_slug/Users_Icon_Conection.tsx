@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { UsersIcon } from "../icons_slug/users_room";
+import UsersIcon from "../icons_slug/users_room";
 
 import useSessionStorage from "@/useCustoms/sessionStorage";
 
@@ -14,6 +14,7 @@ export function PlayersInRoom(){
     const [viewers, setViewers] = useState<number>(1);
     const [sessionStorageCode] = useSessionStorage("Code_Cinema_Room");
     const [sessionStorageUsername] = useSessionStorage("Username_Cinema_Room");
+    const [sessionStorageHost] = useSessionStorage("Host_Cinema_Room");
     const isMobile = useMobile();
 
     useEffect(() => {
@@ -43,7 +44,8 @@ export function PlayersInRoom(){
                 remove(user_db);
             } else if (currentState === 'visible') {
                 set(ref(database, `${sessionStorageCode}/users/` + sessionStorageUsername), { 
-                    username: sessionStorageUsername
+                    username: sessionStorageUsername,
+                    host: JSON.parse(sessionStorageHost)
                 });
                 set(ref(database, `rooms/${sessionStorageCode}`), { 
                     code_video: sessionStorageCode
@@ -68,7 +70,7 @@ export function PlayersInRoom(){
                 document.removeEventListener('visibilitychange', handleVisibilityChange);
             }
         };
-    }, [sessionStorageCode, sessionStorageUsername, isMobile]);
+    }, [sessionStorageCode, sessionStorageUsername, isMobile, sessionStorageHost]);
 
     return(
         <div className="col-sm-4">

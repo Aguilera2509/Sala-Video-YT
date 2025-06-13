@@ -107,4 +107,4 @@ const ShieldCheckIcon = forwardRef<ShieldCheckIconHandle, ShieldCheckIconProps>(
 
 ShieldCheckIcon.displayName = 'ShieldCheckIcon';
 
-export { ShieldCheckIcon };
+export default ShieldCheckIcon;

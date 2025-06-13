@@ -1,6 +1,6 @@
 "use client"
 
-import { ShieldCheckIcon } from "../icons_slug/code_room";
+import ShieldCheckIcon from "../icons_slug/code_room";
 
 export function CodeRoom(){
     return(

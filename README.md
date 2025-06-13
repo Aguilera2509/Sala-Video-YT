@@ -66,6 +66,8 @@ The onPlaybackQualityChange event is still supported and might signal a change i
 Project don't save any info about the rooms(viewers, chats) or videos(urls, details) when everyone is out of the room, all the info get deleted.
 After all This project is the product NOT the users.
 
+And if inside the room there are 2 or more **HOST** all automatically will be deleted and everyone will get out. 
+
 ## Previous Version
 
 Actually this is a much better version of one of my previous projects due to:

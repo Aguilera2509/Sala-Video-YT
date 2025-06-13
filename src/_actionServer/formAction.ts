@@ -44,7 +44,7 @@ export async function serverActionCreateRoom(dataCreate:DataCreateState, index_r
         };
 
         create_room_db(code_video);
-        writeUserDB(data.form.username, code_video);
+        writeUserDB(data.form.username, code_video, true);
 
         return {
             ...data, success: {
@@ -113,7 +113,7 @@ export async function serverActionJoinRoom(dataJoin: DataJoinState, index_userna
             statusMessage: "Not Found, Cinema Room not existing"
         };
 
-        writeUserDB(data.form.username, data.form.code);
+        writeUserDB(data.form.username, data.form.code, false);
 
         return {
             ...data, success: {
@@ -150,8 +150,9 @@ function create_room_db(code_video:string) {
     });
 };
 
-function writeUserDB(username:string, code_video:string) {
+function writeUserDB(username:string, code_video:string, host: boolean) {
     set(ref(database, `${code_video}/users/` + username), { 
-        username
+        username,
+        host
     });
 };

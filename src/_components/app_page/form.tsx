@@ -57,8 +57,8 @@ export function Form_CinemaRoom(){
         e.preventDefault();
         setLoading(true);
 
-        const code_video:string = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=([a-zA-Z0-9_-]+){11})(?:&.*)?$/.test(dataCreate.form.url_yt) ? 
-            dataCreate.form.url_yt.substring(32, 43) :  /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/([a-zA-Z0-9_-]+){11}\?si=([a-zA-Z0-9_-]+))(?:&.*)?$/.test(dataCreate.form.url_yt) ? dataCreate.form.url_yt.substring(17, 28) : ""
+        const code_video:string = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=([a-zA-Z0-9_-]+){11})(?:&.*)?$/.test(dataCreate.form.url_yt.trim().replaceAll(" ", "")) ? 
+            dataCreate.form.url_yt.trim().replaceAll(" ", "").substring(32, 43) :  /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/([a-zA-Z0-9_-]+){11}\?si=([a-zA-Z0-9_-]+))(?:&.*)?$/.test(dataCreate.form.url_yt.trim().replaceAll(" ", "")) ? dataCreate.form.url_yt.trim().replaceAll(" ", "").substring(17, 28) : ""
         const index_room:number = rooms.findIndex(el => el === code_video);
 
         try {
@@ -100,8 +100,8 @@ export function Form_CinemaRoom(){
         e.preventDefault();
         setLoading(true);
 
-        const index_username:number = usernames.findIndex(el => el === dataJoin.form.username);
-        const index_room:number = rooms.findIndex(el => el === dataJoin.form.code);
+        const index_username:number = usernames.findIndex(el => el === dataJoin.form.username.trim().replaceAll(" ", "_"));
+        const index_room:number = rooms.findIndex(el => el === dataJoin.form.code.trim().replaceAll(" ", ""));
 
         try {
             const result = await serverActionJoinRoom(dataJoin, index_username, index_room);

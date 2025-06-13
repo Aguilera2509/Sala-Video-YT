@@ -110,4 +110,4 @@ const UsersIcon = forwardRef<UsersIconHandle, UsersIconProps>(
 
 UsersIcon.displayName = 'UsersIcon';
 
-export { UsersIcon };
+export default UsersIcon;
